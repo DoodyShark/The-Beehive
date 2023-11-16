@@ -44,6 +44,15 @@
 #ifndef CTRL_REG1
 #define CTRL_REG1 (uint8_t) 0x20
 #endif
+#ifndef CTRL_REG4
+#define CTRL_REG4 (uint8_t) 0x23
+#endif
+#ifndef FS0
+#define FS0 4
+#endif
+#ifndef FS1
+#define FS1 5
+#endif
 #ifndef OUT_X_L
 #define OUT_X_L (uint8_t) 0x28
 #endif
