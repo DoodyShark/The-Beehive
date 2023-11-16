@@ -123,6 +123,32 @@ uint16_t getZRaw() {
   return data;
 }
 
+void ResetAccelerometer() {
+  WriteByte((uint8_t) 0x1E, (uint8_t) 0b00010000); // CTRL_REG0
+  WriteByte((uint8_t) 0x1F, (uint8_t) 0b00000000); // TEMP_CFG_REG
+  WriteByte((uint8_t) 0x20, (uint8_t) 0b00000111); // CTRL_REG1
+  WriteByte((uint8_t) 0x21, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x22, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x23, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x24, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x25, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x26, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x2E, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x30, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x32, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x33, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x34, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x36, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x37, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x38, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x3A, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x3B, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x3C, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x3D, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x3E, (uint8_t) 0b00000000); // 
+  WriteByte((uint8_t) 0x3F, (uint8_t) 0b00000000); //
+}
+
 void setup() {
   Serial.begin(9600);
   SPI_MasterInit();
