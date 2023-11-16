@@ -39,3 +39,26 @@
 #ifndef CS
 #define CS 4
 #endif
+
+// Relevent LI3DH Registers
+#ifndef CTRL_REG1
+#define CTRL_REG1 (uint8_t) 0x20
+#endif
+#ifndef OUT_X_L
+#define OUT_X_L (uint8_t) 0x28
+#endif
+#ifndef OUT_X_H
+#define OUT_X_H (uint8_t) 0x29
+#endif
+#ifndef OUT_Y_L
+#define OUT_Y_L (uint8_t) 0x2A
+#endif
+#ifndef OUT_Y_H
+#define OUT_Y_H (uint8_t) 0x2B
+#endif
+#ifndef OUT_Z_L
+#define OUT_Z_L (uint8_t) 0x2C
+#endif
+#ifndef OUT_Z_H
+#define OUT_Z_H (uint8_t) 0x2D
+#endif
