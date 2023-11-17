@@ -135,37 +135,37 @@ class LIS3DHSettings{
         if (this->power_mode == 'l') {
             switch (this->max_accel) {
                 case 2:
-                    return 16384 / 2;
+                    return 16384;
                 case 4:
-                    return 8192 / 4;
+                    return 8192;
                 case 8:
-                    return 4096 / 8;
+                    return 4096;
                 case 16:
-                    return 2048 / 16;
+                    return 2048;
             }
         }
         else if (this->power_mode == 'n') {
             switch (this->max_accel) {
                 case 2:
-                    return 32768 / 2;
+                    return 32768;
                 case 4:
-                    return 16384 / 4;
+                    return 16384;
                 case 8:
-                    return 8192 / 8;
+                    return 8192;
                 case 16:
-                    return 4096 / 16;
+                    return 4096;
             }
         }
         else {
             switch (this->max_accel) {
                 case 2:
-                    return 65536 / 2;
+                    return 65536;
                 case 4:
-                    return 32768 / 4;
+                    return 32768;
                 case 8:
-                    return 16384 / 8;
+                    return 16384;
                 case 16:
-                    return 8192 / 16;
+                    return 8192;
             }
         }
     }
