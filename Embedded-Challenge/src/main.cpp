@@ -11,10 +11,7 @@
 #define LIS3DH_OWN 0
 #endif
 
-// using namespace LIS3DH_Own::Setup;
-// using namespace LIS3DH_Own::Data;
-
-LIS3DHSettings settings = LIS3DHSettings(4, 10, 'l', true, true, true);
+LIS3DHSettings settings = LIS3DHSettings(8, 10, 'h', true, true, true);
 LIS3DH LIS3DH_Handler = LIS3DH(settings);
 
 void setup() {

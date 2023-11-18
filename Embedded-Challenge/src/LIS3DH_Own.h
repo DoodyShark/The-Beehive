@@ -98,11 +98,17 @@ class LIS3DH {
         setFreq();
         setPowerMode();
         setMaxAccel();
+        delay(100);
     }
 
     int16_t getXRaw() {
-        uint16_t data = ReadTwoBytes(OUT_X_L);
-        return (int16_t) data;
+        int16_t data = ReadTwoBytes(OUT_X_L);
+        int shift = 16 - 8;
+        if (this->settings.get_power_mode() == 'n')
+            shift = 16 - 10;
+        else if (this->settings.get_power_mode() == 'h')
+            shift = 16 - 12;
+        return (int16_t) (data >> shift);
     }
 
     float getXFloat() {
@@ -112,8 +118,13 @@ class LIS3DH {
     }
 
     int16_t getYRaw() {
-        uint16_t data = ReadTwoBytes(OUT_Y_L);
-        return (int16_t) data;
+        int16_t data = ReadTwoBytes(OUT_Y_L);
+        int shift = 16 - 8;
+        if (this->settings.get_power_mode() == 'n')
+            shift = 16 - 10;
+        else if (this->settings.get_power_mode() == 'h')
+            shift = 16 - 12;
+        return (int16_t) (data >> shift);
     }
 
     float getYFloat() {
@@ -123,8 +134,13 @@ class LIS3DH {
     }
 
     int16_t getZRaw() {
-        uint16_t data = ReadTwoBytes(OUT_Z_L);
-        return (int16_t) data;
+        int16_t data = ReadTwoBytes(OUT_Z_L);
+        int shift = 16 - 8;
+        if (this->settings.get_power_mode() == 'n')
+            shift = 16 - 10;
+        else if (this->settings.get_power_mode() == 'h')
+            shift = 16 - 12;
+        return (int16_t) (data >> shift);
     }
 
     float getZFloat() {

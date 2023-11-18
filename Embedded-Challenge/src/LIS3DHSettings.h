@@ -37,6 +37,30 @@ class LIS3DHSettings{
         this->zen = z;
     }
 
+    int get_freq() {
+        return this->frequency;
+    }
+
+    int get_max_accel() {
+        return this->max_accel;
+    }
+
+    char get_power_mode() {
+        return this->power_mode;
+    }
+
+    bool get_xen() {
+        return this->xen;
+    }
+
+    bool get_yen() {
+        return this->yen;
+    }
+
+    bool get_zen() {
+        return this->zen;
+    }
+
     uint8_t Freq_to_Byte(uint8_t curr_val) {
         switch (this->frequency) {
         case 0:
@@ -135,39 +159,40 @@ class LIS3DHSettings{
         if (this->power_mode == 'l') {
             switch (this->max_accel) {
                 case 2:
-                    return 16384;
+                    return 64;
                 case 4:
-                    return 8192;
+                    return 32;
                 case 8:
-                    return 4096;
+                    return 16;
                 case 16:
-                    return 2048;
+                    return 8;
             }
         }
         else if (this->power_mode == 'n') {
             switch (this->max_accel) {
                 case 2:
-                    return 32768;
+                    return 256;
                 case 4:
-                    return 16384;
+                    return 128;
                 case 8:
-                    return 8192;
+                    return 64;
                 case 16:
-                    return 4096;
+                    return 32;
             }
         }
         else {
             switch (this->max_accel) {
                 case 2:
-                    return 65536;
+                    return 1028;
                 case 4:
-                    return 32768;
+                    return 512;
                 case 8:
-                    return 16384;
+                    return 256;
                 case 16:
-                    return 8192;
+                    return 128;
             }
         }
+        return 1;
     }
 
 };
