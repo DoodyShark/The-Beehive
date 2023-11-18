@@ -11,7 +11,7 @@
 #define LIS3DH_SETTINGS 0
 #endif
 
-using namespace SPI_Own;
+using namespace SPI;
 
 class LIS3DH {
     private:
@@ -104,9 +104,9 @@ class LIS3DH {
     int16_t getXRaw() {
         int16_t data = ReadTwoBytes(OUT_X_L);
         int shift = 16 - 8;
-        if (this->settings.get_power_mode() == 'n')
+        if (this->settings.get_power_mode() == (PM) N)
             shift = 16 - 10;
-        else if (this->settings.get_power_mode() == 'h')
+        else if (this->settings.get_power_mode() == (PM) H)
             shift = 16 - 12;
         return (int16_t) (data >> shift);
     }
@@ -117,12 +117,16 @@ class LIS3DH {
         return 0.0;
     }
 
+    float getXFloat_SI() {
+        return getXFloat() * 9.8;
+    }
+
     int16_t getYRaw() {
         int16_t data = ReadTwoBytes(OUT_Y_L);
         int shift = 16 - 8;
-        if (this->settings.get_power_mode() == 'n')
+        if (this->settings.get_power_mode() == (PM) N)
             shift = 16 - 10;
-        else if (this->settings.get_power_mode() == 'h')
+        else if (this->settings.get_power_mode() == (PM) H)
             shift = 16 - 12;
         return (int16_t) (data >> shift);
     }
@@ -133,12 +137,16 @@ class LIS3DH {
         return 0.0;
     }
 
+    float getYFloat_SI() {
+        return getYFloat() * 9.8;
+    }
+
     int16_t getZRaw() {
         int16_t data = ReadTwoBytes(OUT_Z_L);
         int shift = 16 - 8;
-        if (this->settings.get_power_mode() == 'n')
+        if (this->settings.get_power_mode() == (PM) N)
             shift = 16 - 10;
-        else if (this->settings.get_power_mode() == 'h')
+        else if (this->settings.get_power_mode() == (PM) H)
             shift = 16 - 12;
         return (int16_t) (data >> shift);
     }
@@ -147,6 +155,10 @@ class LIS3DH {
         float div_factor = this->settings.Calc_Div_Factor();
         return (float) getZRaw() / div_factor;
         return 0.0;
+    }
+
+    float getZFloat_SI() {
+        return getZFloat() * 9.8;
     }
 
 };

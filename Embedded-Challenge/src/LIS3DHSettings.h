@@ -7,12 +7,22 @@
 #define LIS3DH_PREDIRECTIVES 0
 #endif
 
+enum PM {
+    L = 0,
+    N = 1,
+    H = 2
+};
+
+enum EN {
+    DISABLED, ENABLED
+};
+
 class LIS3DHSettings{
 
     private:
     int max_accel;
     int frequency;
-    char power_mode;
+    PM power_mode;
     bool xen;
     bool yen;
     bool zen;
@@ -22,13 +32,13 @@ class LIS3DHSettings{
     LIS3DHSettings() {
         this->max_accel = 16;
         this->frequency = 1;
-        this->power_mode = 'h';
+        this->power_mode = (PM) L;
         this->xen = true;
         this->yen = true;
         this->zen = true;
     }
 
-    LIS3DHSettings(int max_a, int freq, char p_m, bool x, bool y, bool z) {
+    LIS3DHSettings(int max_a, int freq, PM p_m, EN x, EN y, EN z) {
         this->max_accel = max_a;
         this->frequency = freq;
         this->power_mode = p_m;
@@ -45,7 +55,7 @@ class LIS3DHSettings{
         return this->max_accel;
     }
 
-    char get_power_mode() {
+    PM get_power_mode() {
         return this->power_mode;
     }
 
@@ -139,15 +149,15 @@ class LIS3DHSettings{
 
     uint16_t Power_Mode_to_Byte(uint8_t curr_val1, uint8_t curr_val4) {
         switch (this->power_mode) {
-            case 'l':
+            case (PM) L:
                 curr_val1 |= ((uint8_t)1 << LPEN);
                 curr_val4 &= ~((uint8_t)1 << HR);
             break;
-            case 'n':
+            case (PM) N:
                 curr_val1 &= ~((uint8_t)1 << LPEN);
                 curr_val4 &= ~((uint8_t)1 << HR);
             break;
-            case 'h':
+            case (PM) H:
                 curr_val1 &= ~((uint8_t)1 << LPEN);
                 curr_val4 |= ((uint8_t)1 << HR);
             break;

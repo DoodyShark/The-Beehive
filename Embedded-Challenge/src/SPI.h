@@ -1,9 +1,9 @@
 #ifndef PREDIRECTIVES
-#include "predirectives.cpp"
+#include "predirectives.h"
 #define PREDIRECTIVES 0
 #endif
 
-namespace SPI_Own {
+namespace SPI {
   /// @brief Setup the SPI Connection as Master CPU
   void SPI_MasterInit()
   {
