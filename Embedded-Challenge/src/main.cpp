@@ -43,7 +43,9 @@ void SetupPWMTimer() {
 
 
 void setup() {
-  SetupPWMTimer();
+  //SetupPWMTimer();
+  pinMode(13, OUTPUT);//led indicator when singing a note
+  DDRC |= (1 << 6);
   Serial.begin(9600);
   SPI_MasterInit();
   LIS3DH_Handler = LIS3DH(settings);
