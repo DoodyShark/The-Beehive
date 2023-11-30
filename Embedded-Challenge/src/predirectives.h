@@ -4,6 +4,10 @@
         #include <Arduino.h>
     #endif
 #endif
+// #ifndef INTTYPES
+// #include <inttypes.h>
+// #define INTTYPES 0
+// #endif
 
 // Relevant SPI Registers & Values
 #ifndef DDRB
@@ -38,4 +42,22 @@
 #endif
 #ifndef CS
 #define CS 4
+#endif  
+#ifndef PORTB
+#define PORTB (*(volatile uint8_t *)((0x05) + 0x20))
+#endif
+#ifndef SPDR
+#define SPDR (*(volatile uint8_t *)((0x2E) + 0x20))
+#endif
+#ifndef SPSR
+#define SPSR (*(volatile uint8_t *)((0x2D) + 0x20))
+#endif
+#ifndef SPIF
+#define SPIF 7
+#endif
+#ifndef abs
+#define abs(x) (x>0)?x:(-x)
+#endif
+#ifndef DDRC
+#define DDRC (*(volatile uint8_t *)((0x07) + 0x20))
 #endif

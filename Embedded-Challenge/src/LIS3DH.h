@@ -98,7 +98,8 @@ class LIS3DH {
         setFreq();
         setPowerMode();
         setMaxAccel();
-        delay(100);
+        for (long i = 0; i < 1000000; i++);
+        // delay(100);
     }
 
     int16_t getXRaw() {
