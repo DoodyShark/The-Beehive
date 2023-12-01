@@ -89,92 +89,72 @@
 #define NOTE_DS8 4978
 #define REST 0
 
-#define W 16
-#define H  8 
-#define Q  4 
-#define E  2
-#define S  1
-#define W_DOT 24
-#define H_DOT 12
-#define Q_DOT  6
-#define E_DOT  3
+// #define W 16
+// #define H  8 
+// #define Q  4 
+// #define E  2
+// #define S  1
+// #define W_DOT 24
+// #define H_DOT 12
+// #define Q_DOT  6
+// #define E_DOT  3
 
-// //Mario main theme melody
-// int melody[] = {
-//   NOTE_E7, NOTE_E7, 0, NOTE_E7,
-//   0, NOTE_C7, NOTE_E7, 0,
-//   NOTE_G7, 0, 0,  0,
-//   NOTE_G6, 0, 0, 0,
+//Mario main theme melody
+const uint16_t melody[] = {
+  NOTE_E7, NOTE_E7, 0, NOTE_E7,
+  0, NOTE_C7, NOTE_E7, 0,
+  NOTE_G7, 0, 0,  0,
+  NOTE_G6, 0, 0, 0,
 
-//   NOTE_C7, 0, 0, NOTE_G6,
-//   0, 0, NOTE_E6, 0,
-//   0, NOTE_A6, 0, NOTE_B6,
-//   0, NOTE_AS6, NOTE_A6, 0,
+  NOTE_C7, 0, 0, NOTE_G6,
+  0, 0, NOTE_E6, 0,
+  0, NOTE_A6, 0, NOTE_B6,
+  0, NOTE_AS6, NOTE_A6, 0,
 
-//   NOTE_G6, NOTE_E7, NOTE_G7,
-//   NOTE_A7, 0, NOTE_F7, NOTE_G7,
-//   0, NOTE_E7, 0, NOTE_C7,
-//   NOTE_D7, NOTE_B6, 0, 0,
+  NOTE_G6, NOTE_E7, NOTE_G7,
+  NOTE_A7, 0, NOTE_F7, NOTE_G7,
+  0, NOTE_E7, 0, NOTE_C7,
+  NOTE_D7, NOTE_B6, 0, 0
+};
+//Mario main them tempo
+const uint16_t tempo[] = {
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+  12, 12, 12, 12,
 
-//   NOTE_C7, 0, 0, NOTE_G6,
-//   0, 0, NOTE_E6, 0,
-//   0, NOTE_A6, 0, NOTE_B6,
-//   0, NOTE_AS6, NOTE_A6, 0,
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+  12, 12, 12, 12,
 
-//   NOTE_G6, NOTE_E7, NOTE_G7,
-//   NOTE_A7, 0, NOTE_F7, NOTE_G7,
-//   0, NOTE_E7, 0, NOTE_C7,
-//   NOTE_D7, NOTE_B6, 0, 0
-// };
-// //Mario main them tempo
-// int tempo[] = {
-//   12, 12, 12, 12,
-//   12, 12, 12, 12,
-//   12, 12, 12, 12,
-//   12, 12, 12, 12,
-
-//   12, 12, 12, 12,
-//   12, 12, 12, 12,
-//   12, 12, 12, 12,
-//   12, 12, 12, 12,
-
-//   9, 9, 9,
-//   12, 12, 12, 12,
-//   12, 12, 12, 12,
-//   12, 12, 12, 12,
-
-//   12, 12, 12, 12,
-//   12, 12, 12, 12,
-//   12, 12, 12, 12,
-//   12, 12, 12, 12,
-
-//   9, 9, 9,
-//   12, 12, 12, 12,
-//   12, 12, 12, 12,
-//   12, 12, 12, 12,
-// };
+  9, 9, 9,
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+};
 // //Underworld melody
-// int underworld_melody[] = {
-//   NOTE_C4, NOTE_C5, NOTE_A3, NOTE_A4,
-//   NOTE_AS3, NOTE_AS4, 0,
-//   0,
-//   NOTE_C4, NOTE_C5, NOTE_A3, NOTE_A4,
-//   NOTE_AS3, NOTE_AS4, 0,
-//   0,
-//   NOTE_F3, NOTE_F4, NOTE_D3, NOTE_D4,
-//   NOTE_DS3, NOTE_DS4, 0,
-//   0,
-//   NOTE_F3, NOTE_F4, NOTE_D3, NOTE_D4,
-//   NOTE_DS3, NOTE_DS4, 0,
-//   0, NOTE_DS4, NOTE_CS4, NOTE_D4,
-//   NOTE_CS4, NOTE_DS4,
-//   NOTE_DS4, NOTE_GS3,
-//   NOTE_G3, NOTE_CS4,
-//   NOTE_C4, NOTE_FS4, NOTE_F4, NOTE_E3, NOTE_AS4, NOTE_A4,
-//   NOTE_GS4, NOTE_DS4, NOTE_B3,
-//   NOTE_AS3, NOTE_A3, NOTE_GS3,
-//   0, 0, 0
-// };
+int underworld_melody[] = {
+  NOTE_C4, NOTE_C5, NOTE_A3, NOTE_A4,
+  NOTE_AS3, NOTE_AS4, 0,
+  0,
+  NOTE_C4, NOTE_C5, NOTE_A3, NOTE_A4,
+  NOTE_AS3, NOTE_AS4, 0,
+  0,
+  NOTE_F3, NOTE_F4, NOTE_D3, NOTE_D4,
+  NOTE_DS3, NOTE_DS4, 0,
+  0,
+  NOTE_F3, NOTE_F4, NOTE_D3, NOTE_D4,
+  NOTE_DS3, NOTE_DS4, 0,
+  0, NOTE_DS4, NOTE_CS4, NOTE_D4,
+  NOTE_CS4, NOTE_DS4,
+  NOTE_DS4, NOTE_GS3,
+  NOTE_G3, NOTE_CS4,
+  NOTE_C4, NOTE_FS4, NOTE_F4, NOTE_E3, NOTE_AS4, NOTE_A4,
+  NOTE_GS4, NOTE_DS4, NOTE_B3,
+  NOTE_AS3, NOTE_A3, NOTE_GS3,
+  0, 0, 0
+};
 // //Underwolrd tempo
 // int underworld_tempo[] = {
 //   12, 12, 12, 12,
@@ -199,15 +179,13 @@
 // };
 //Start melody
 const uint16_t start_melody[] = { 
-  NOTE_E7, NOTE_E7, 0, NOTE_E7,
-  0, NOTE_C7, NOTE_E7, 0,
-  NOTE_G7
+  NOTE_C4, NOTE_C5, NOTE_A3, NOTE_A4,
+  NOTE_AS3, NOTE_AS4, 0
 };
 //Start tempo
 const uint16_t start_tempo[] = { 
   12, 12, 12, 12,
-  12, 12, 12, 12,
-  12
+  12, 12, 6
 };
 //Processing melody
 const uint16_t processing_melody[] = {
@@ -218,9 +196,9 @@ const uint16_t processing_tempo[] = {
   10, 10
 };
 
-const uint16_t* melodies[] = { start_melody , processing_melody };
-const uint16_t* tempos[] = { start_tempo, processing_tempo };
-const uint16_t sizes[] = { sizeof(start_tempo) / sizeof(uint16_t), sizeof(processing_tempo) / sizeof(uint16_t) };
+const uint16_t* melodies[] = { melody, start_melody , processing_melody };
+const uint16_t* tempos[] = { tempo, start_tempo, processing_tempo };
+const uint16_t sizes[] = { sizeof(tempo) / sizeof(uint16_t), sizeof(start_tempo) / sizeof(uint16_t), sizeof(processing_tempo) / sizeof(uint16_t) };
 
 // void SetupPWMTimer() {
 //   // SETTING UP TIMER1 TO PRODUCE OUTPUT AT OC1B (PB6)
@@ -245,7 +223,7 @@ const uint16_t sizes[] = { sizeof(start_tempo) / sizeof(uint16_t), sizeof(proces
 
 
 enum Song {
+  MARIO,
   START,
-  PROCESSING,
-  KK_BOSSA
+  PROCESSING
 };

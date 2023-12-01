@@ -14,7 +14,7 @@
 #define SPEAKER 0
 #include "speaker.h"
 #endif
-#define NO_MOTION_TIME 5
+#define NO_MOTION_TIME 3
 #define COLLECTER_SIZE 100
 #define WINDOW_SIZE 5
 #define NO_MOTION_THRESHOLD 0.75
@@ -40,18 +40,22 @@ using namespace std;
 */
 char state = 'i';
 
-float collecter[COLLECTER_SIZE][4] {{0}}; // Holds data { t, ax, ay, az }
+int16_t collecter[COLLECTER_SIZE][3] {{0}}; // Holds data { t, ax, ay, az }
 int collecter_index = 0;
 
-float subtotals[3] = {0};
+long subtotals[3] = {0};
 int window_index = 0;
 
+long prev_last_ms;
 long last_ms;
 
-int idle_freq = 1;
-int active_freq = 10;
+float average_time_diff = 0;
+uint32_t count_ticks = 0;
 
-int wait_between_checks = 0;
+uint8_t idle_freq = 2;
+uint8_t active_freq = 2;
+
+uint8_t wait_between_checks = 0;
 
 void setup() {
   DDRC |= (1 << 7);
@@ -62,29 +66,25 @@ void setup() {
   SPI_MasterInit();
   LIS3DH_Handler = LIS3DH(settings);
   LIS3DH_Handler.SetupAccelerometer();
+  sing((Song) MARIO);
   last_ms = millis();
 }
 
-bool collect(int frequency) {
+bool collect(uint8_t frequency) {
   if (millis() - last_ms >= 1000.0 / (frequency * WINDOW_SIZE)) {
-    subtotals[0] += LIS3DH_Handler.getXFloat_SI();
-    subtotals[1] += LIS3DH_Handler.getYFloat_SI();
-    subtotals[2] += LIS3DH_Handler.getZFloat_SI();
+    prev_last_ms = last_ms;
+    last_ms = millis();
+    subtotals[0] += LIS3DH_Handler.getXRaw();
+    subtotals[1] += LIS3DH_Handler.getYRaw();
+    subtotals[2] += LIS3DH_Handler.getZRaw();
     window_index++;
   }
-  if (window_index == 5) {
-    last_ms = millis();
-    collecter[collecter_index][0] = (float) last_ms / (float) 1000;
-    collecter[collecter_index][1] = subtotals[0] / window_index ;
-    collecter[collecter_index][2] = subtotals[1] / window_index ;
-    collecter[collecter_index][3] = subtotals[2] / window_index ;
-    // Serial.print("(");
-    // Serial.print(collecter[collecter_index][0]);
-    // Serial.print(", ");
-    // Serial.print(collecter[collecter_index][1]);
-    // Serial.print(", ");
-    // Serial.print(collecter[collecter_index][2]);
-    // Serial.print(")");
+  if (window_index == WINDOW_SIZE) {
+    average_time_diff = (average_time_diff * count_ticks + (float) (last_ms - prev_last_ms) * (float) WINDOW_SIZE / 1000.0) / (count_ticks + 1);
+    count_ticks ++;
+    collecter[collecter_index][0] = subtotals[0] / window_index ;
+    collecter[collecter_index][1] = subtotals[1] / window_index ;
+    collecter[collecter_index][2] = subtotals[2] / window_index ;
     collecter_index++;
     window_index = 0;
     subtotals[0] = subtotals[1] = subtotals[2] = 0;
@@ -96,23 +96,37 @@ bool collect(int frequency) {
 bool check_start() {
   bool res = true;
   int stop = NO_MOTION_TIME * idle_freq;
+  Serial.println("------------");
   for (int i = 1; i < stop; i++) {
-    float idle_jerk_x = (collecter[collecter_index - 5 + i][1] - collecter[collecter_index - 5 + (i - 1)][1]) / (collecter[collecter_index - 5 + i][0] - collecter[collecter_index - 5 + (i - 1)][0]);
-    float idle_jerk_y = (collecter[collecter_index - 5 + i][2] - collecter[collecter_index - 5 + (i - 1)][2]) / (collecter[collecter_index - 5 + i][0] - collecter[collecter_index - 5 + (i - 1)][0]);
-    float idle_jerk_z = (collecter[collecter_index - 5 + i][3] - collecter[collecter_index - 5 + (i - 1)][3]) / (collecter[collecter_index - 5 + i][0] - collecter[collecter_index - 5 + (i - 1)][0]);
+    float factor = settings.Calc_Div_Factor();
+    float idle_jerk_x = (collecter[collecter_index - stop + i][0] - collecter[collecter_index - stop + (i - 1)][0]) / (factor * average_time_diff);
+    float idle_jerk_y = (collecter[collecter_index - stop + i][1] - collecter[collecter_index - stop + (i - 1)][1]) / (factor * average_time_diff);
+    float idle_jerk_z = (collecter[collecter_index - stop + i][2] - collecter[collecter_index - stop + (i - 1)][2]) / (factor * average_time_diff);
     res &= (abs(idle_jerk_x) < NO_MOTION_THRESHOLD) && (abs(idle_jerk_y) < NO_MOTION_THRESHOLD) && (abs(idle_jerk_z) < NO_MOTION_THRESHOLD);
+    Serial.print(average_time_diff);
+    Serial.print(": (");
+    Serial.print(idle_jerk_x);
+    Serial.print(", ");
+    Serial.print(idle_jerk_y);
+    Serial.print(", ");
+    Serial.print(idle_jerk_z);
+    Serial.print(")");
+    Serial.println();
   }
+  Serial.println("------------");
   wait_between_checks = 0;
   return res;
 }
 
-void flush(float acceleration_collector[][4], int& index) {
+void flush(int16_t acceleration_collector[][3], int& index) {
   for (int i = 0; i < index; i++) {
-    for (int j = 0; j < 4; j++) {
+    for (int j = 0; j < 3; j++) {
       acceleration_collector[i][j] = 0;
     }
   }
   index = 0;
+  count_ticks = 0;
+  average_time_diff = 0;
 }
 
 bool just_added = false;
