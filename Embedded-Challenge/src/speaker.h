@@ -11,7 +11,7 @@
 #endif
 
 
-void buzz(long frequency, long length) {
+void buzz(uint16_t frequency, long length) {
   PORTC |= (1 << 7);
   long delayValue = 1000000 / frequency / 2; // calculate the delay value between transitions
   //// 1 second's worth of microseconds, divided by the frequency, then split in half since
@@ -41,9 +41,9 @@ void sing(Song s) {
     // to calculate the note duration, take one second
     // divided by the note type.
     //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
-    int noteDuration = 1000 / curr_tempo[thisNote];
+    int noteDuration = 1000 / pgm_read_word(curr_tempo + thisNote);
 
-    buzz(curr_melody[thisNote], noteDuration);
+    buzz(pgm_read_word(curr_melody + thisNote), noteDuration);
 
     // to distinguish the notes, set a minimum time between them.
     // the note's duration + 30% seems to work well:

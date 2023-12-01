@@ -4,10 +4,6 @@
         #include <Arduino.h>
     #endif
 #endif
-// #ifndef INTTYPES
-// #include <inttypes.h>
-// #define INTTYPES 0
-// #endif
 
 // Relevant SPI Registers & Values
 #ifndef DDRB
