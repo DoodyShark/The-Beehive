@@ -14,11 +14,12 @@
 #define SPEAKER 0
 #include "speaker.h"
 #endif
-#define IDLE_COLLECTER_SIZE 5
-#define ACTIVE_COLLECTER_SIZE 50
+#define NO_MOTION_TIME 5
+#define COLLECTER_SIZE 100
 #define WINDOW_SIZE 5
+#define NO_MOTION_THRESHOLD 0.75
 
-LIS3DHSettings settings = LIS3DHSettings(4, 10, H, ENABLED, ENABLED, ENABLED);
+LIS3DHSettings settings = LIS3DHSettings(4, 10, (PM) H, ENABLED, ENABLED, ENABLED);
 LIS3DH LIS3DH_Handler = LIS3DH(settings);
 
 using namespace std;
@@ -39,49 +40,24 @@ using namespace std;
 */
 char state = 'i';
 
-float idle_collector[IDLE_COLLECTER_SIZE][4]; // Holds data as tuples { t, {ax, ay, az} }
-float idle_jerk_collector[IDLE_COLLECTER_SIZE][3]; // Holds data as tuples { t, {jx, jy, jz} }
-int idle_index = 0;
+float collecter[COLLECTER_SIZE][4] {{0}}; // Holds data { t, ax, ay, az }
+int collecter_index = 0;
 
-float active_collector[ACTIVE_COLLECTER_SIZE][4]; // Holds data as tuples { t, {ax, ay, az} }
-float active_jerk_collector[ACTIVE_COLLECTER_SIZE][3]; // Holds data as tuples { t, {jx, jy, jz} }
-int active_index = 0;
-
-float window[WINDOW_SIZE][3] = {{0}};
+float subtotals[3] = {0};
+int window_index = 0;
 
 long last_ms;
 
 int idle_freq = 1;
 int active_freq = 10;
 
-void SetupPWMTimer() {
-  // SETTING UP TIMER1 TO PRODUCE OUTPUT AT OC1B (PB6)
-  // WGM13-WGM10 = 0111 for fast PWM with 0x03ff as TOP:
-  TCCR3B &= ~(1 << WGM33);
-  TCCR3B &= ~(1 << WGM32);
-  TCCR3A |= (1 << WGM31);
-  TCCR3A |= (1 << WGM30);
-  
-  // COM3A1-0 = 10 For clearing OC3A at compare match, setting at TOP
-  TCCR3A |= (1 << 7);
-  TCCR3A &= ~(1 << 6);
-  // CSn2-0 = 011 for clkI/O prescaling by 64
-  TCCR3B &= ~(1 << 2);
-  TCCR3B |= (1 << 1);
-  TCCR3B &= ~(1 << 0);
-  // Setting up OCR3A
-  OCR3AH = (uint8_t) 0x00;
-  OCR3AL = (uint8_t) 0x00;
-  // Setting up PC6 in output mode to produce OC1A:
-  DDRC |= (1 << 6);
-}
-
+int wait_between_checks = 0;
 
 void setup() {
-  //SetupPWMTimer();
-  // pinMode(13, OUTPUT);//led indicator when singing a note
-  DDRD &= ~(1 << 4);
+  DDRC |= (1 << 7);
   DDRC |= (1 << 6);
+  DDRF &= ~(1 << 6);
+  DDRD &= ~(1 << 4);
   Serial.begin(9600);
   SPI_MasterInit();
   LIS3DH_Handler = LIS3DH(settings);
@@ -89,19 +65,29 @@ void setup() {
   last_ms = millis();
 }
 
-bool collect(float acceleration_collector[][4], int& index, float jerk_collector[][3], int frequency, long& last_ms) {
-  if (millis() - last_ms >= 1000.0 / frequency) {
+bool collect(int frequency) {
+  if (millis() - last_ms >= 1000.0 / (frequency * WINDOW_SIZE)) {
+    subtotals[0] += LIS3DH_Handler.getXFloat_SI();
+    subtotals[1] += LIS3DH_Handler.getYFloat_SI();
+    subtotals[2] += LIS3DH_Handler.getZFloat_SI();
+    window_index++;
+  }
+  if (window_index == 5) {
     last_ms = millis();
-    acceleration_collector[index][0] = (float) last_ms / (float) 1000;
-    acceleration_collector[index][1] = LIS3DH_Handler.getXFloat_SI();
-    acceleration_collector[index][2] = LIS3DH_Handler.getYFloat_SI();
-    acceleration_collector[index][3] = LIS3DH_Handler.getZFloat_SI();
-    if (index > 0) {
-      jerk_collector[index - 1][0] = (acceleration_collector[index][1] - acceleration_collector[index - 1][1]) * 1000.0 / (last_ms - acceleration_collector[index - 1][0]);
-      jerk_collector[index - 1][1] = (acceleration_collector[index][2] - acceleration_collector[index - 1][2]) * 1000.0 / (last_ms - acceleration_collector[index - 1][0]);
-      jerk_collector[index - 1][2] = (acceleration_collector[index][3] - acceleration_collector[index - 1][3]) * 1000.0 / (last_ms - acceleration_collector[index - 1][0]); 
-    }
-    index++;
+    collecter[collecter_index][0] = (float) last_ms / (float) 1000;
+    collecter[collecter_index][1] = subtotals[0] / window_index ;
+    collecter[collecter_index][2] = subtotals[1] / window_index ;
+    collecter[collecter_index][3] = subtotals[2] / window_index ;
+    // Serial.print("(");
+    // Serial.print(collecter[collecter_index][0]);
+    // Serial.print(", ");
+    // Serial.print(collecter[collecter_index][1]);
+    // Serial.print(", ");
+    // Serial.print(collecter[collecter_index][2]);
+    // Serial.print(")");
+    collecter_index++;
+    window_index = 0;
+    subtotals[0] = subtotals[1] = subtotals[2] = 0;
     return true;
   }
   return false;
@@ -109,34 +95,22 @@ bool collect(float acceleration_collector[][4], int& index, float jerk_collector
 
 bool check_start() {
   bool res = true;
-  for (int i = 0; i < 5; i++) {
-    res &= (abs(idle_jerk_collector[idle_index - (i+1)][0]) < 0.5) && (abs(idle_jerk_collector[idle_index - (i+1)][1]) < 0.5) && (abs(idle_jerk_collector[idle_index - (i+1)][2]) < 0.5);
+  int stop = NO_MOTION_TIME * idle_freq;
+  for (int i = 1; i < stop; i++) {
+    float idle_jerk_x = (collecter[collecter_index - 5 + i][1] - collecter[collecter_index - 5 + (i - 1)][1]) / (collecter[collecter_index - 5 + i][0] - collecter[collecter_index - 5 + (i - 1)][0]);
+    float idle_jerk_y = (collecter[collecter_index - 5 + i][2] - collecter[collecter_index - 5 + (i - 1)][2]) / (collecter[collecter_index - 5 + i][0] - collecter[collecter_index - 5 + (i - 1)][0]);
+    float idle_jerk_z = (collecter[collecter_index - 5 + i][3] - collecter[collecter_index - 5 + (i - 1)][3]) / (collecter[collecter_index - 5 + i][0] - collecter[collecter_index - 5 + (i - 1)][0]);
+    res &= (abs(idle_jerk_x) < NO_MOTION_THRESHOLD) && (abs(idle_jerk_y) < NO_MOTION_THRESHOLD) && (abs(idle_jerk_z) < NO_MOTION_THRESHOLD);
   }
-  Serial.println("----------");
-  Serial.println(res);
-  if (true) {
-    for (int i = 0; i < 5; i++) {
-      Serial.print("(");
-      Serial.print(idle_jerk_collector[idle_index - (i + 1)][0]);
-      Serial.print(", ");
-      Serial.print(idle_jerk_collector[idle_index - (i + 1)][1]);
-      Serial.print(", ");
-      Serial.print(idle_jerk_collector[idle_index - (i + 1)][2]);
-      Serial.print(")");
-      Serial.println();
-    }
-  }
-  Serial.println("----------");
+  wait_between_checks = 0;
   return res;
 }
 
-void flush(float acceleration_collector[][4], int& index, float jerk_collector[][3]) {
+void flush(float acceleration_collector[][4], int& index) {
   for (int i = 0; i < index; i++) {
-    for (int j = 0; j < 3; j++) {
+    for (int j = 0; j < 4; j++) {
       acceleration_collector[i][j] = 0;
-      jerk_collector[i][j] = 0;
     }
-    acceleration_collector[i][3] = 0;
   }
   index = 0;
 }
@@ -146,34 +120,47 @@ bool just_added = false;
 void loop() {
   if (((PIND >> 4) & 1)) {
     state = 'i';
-    flush(idle_collector, idle_index, idle_jerk_collector);
+    flush(collecter, collecter_index);
+  }
+  if (state == 'a' && ((PINF >> 6) & 1)) {
+    state = 'p';
+    sing((Song) PROCESSING);
   }
   switch (state) {
     // IDLE
     case 'i': {
-      if (idle_index < IDLE_COLLECTER_SIZE) {
-        just_added = collect(idle_collector, idle_index, idle_jerk_collector, idle_freq, last_ms);
-        if (just_added && idle_index >= 5) {
-          if (check_start()) {
-            state = 'a';
+      if (collecter_index < COLLECTER_SIZE) {
+        just_added = collect(idle_freq);
+        if (just_added) {
+          wait_between_checks++;
+          if (wait_between_checks >= NO_MOTION_TIME * idle_freq) {
+            if (check_start()) {
+              state = 'a';
+              sing((Song) START);
+            }
           }
         }
       }
       else {
-        flush(idle_collector, idle_index, idle_jerk_collector);
+        flush(collecter, collecter_index);
       }
     }
     break;
     // ACTIVE DATA COLLECTION
     case 'a': {
-      if (active_index < ACTIVE_COLLECTER_SIZE) {
-        collect(active_collector, active_index, active_jerk_collector, active_freq, last_ms);
+      if (collecter_index < COLLECTER_SIZE) {
+        collect(active_freq);
+      }
+      else {
+        state = 'p';
+        sing((Song) PROCESSING);
       }
     }
     break;
     // PROCESSING
     case 'p': {
-
+      Serial.println("Processing");
+      while (true);
     }
     break;
     // DISPLAY

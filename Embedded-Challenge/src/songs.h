@@ -87,102 +87,165 @@
 #define NOTE_CS8 4435
 #define NOTE_D8  4699
 #define NOTE_DS8 4978
+#define REST 0
 
-//Mario main theme melody
-int melody[] = {
+#define W 16
+#define H  8 
+#define Q  4 
+#define E  2
+#define S  1
+#define W_DOT 24
+#define H_DOT 12
+#define Q_DOT  6
+#define E_DOT  3
+
+// //Mario main theme melody
+// int melody[] = {
+//   NOTE_E7, NOTE_E7, 0, NOTE_E7,
+//   0, NOTE_C7, NOTE_E7, 0,
+//   NOTE_G7, 0, 0,  0,
+//   NOTE_G6, 0, 0, 0,
+
+//   NOTE_C7, 0, 0, NOTE_G6,
+//   0, 0, NOTE_E6, 0,
+//   0, NOTE_A6, 0, NOTE_B6,
+//   0, NOTE_AS6, NOTE_A6, 0,
+
+//   NOTE_G6, NOTE_E7, NOTE_G7,
+//   NOTE_A7, 0, NOTE_F7, NOTE_G7,
+//   0, NOTE_E7, 0, NOTE_C7,
+//   NOTE_D7, NOTE_B6, 0, 0,
+
+//   NOTE_C7, 0, 0, NOTE_G6,
+//   0, 0, NOTE_E6, 0,
+//   0, NOTE_A6, 0, NOTE_B6,
+//   0, NOTE_AS6, NOTE_A6, 0,
+
+//   NOTE_G6, NOTE_E7, NOTE_G7,
+//   NOTE_A7, 0, NOTE_F7, NOTE_G7,
+//   0, NOTE_E7, 0, NOTE_C7,
+//   NOTE_D7, NOTE_B6, 0, 0
+// };
+// //Mario main them tempo
+// int tempo[] = {
+//   12, 12, 12, 12,
+//   12, 12, 12, 12,
+//   12, 12, 12, 12,
+//   12, 12, 12, 12,
+
+//   12, 12, 12, 12,
+//   12, 12, 12, 12,
+//   12, 12, 12, 12,
+//   12, 12, 12, 12,
+
+//   9, 9, 9,
+//   12, 12, 12, 12,
+//   12, 12, 12, 12,
+//   12, 12, 12, 12,
+
+//   12, 12, 12, 12,
+//   12, 12, 12, 12,
+//   12, 12, 12, 12,
+//   12, 12, 12, 12,
+
+//   9, 9, 9,
+//   12, 12, 12, 12,
+//   12, 12, 12, 12,
+//   12, 12, 12, 12,
+// };
+// //Underworld melody
+// int underworld_melody[] = {
+//   NOTE_C4, NOTE_C5, NOTE_A3, NOTE_A4,
+//   NOTE_AS3, NOTE_AS4, 0,
+//   0,
+//   NOTE_C4, NOTE_C5, NOTE_A3, NOTE_A4,
+//   NOTE_AS3, NOTE_AS4, 0,
+//   0,
+//   NOTE_F3, NOTE_F4, NOTE_D3, NOTE_D4,
+//   NOTE_DS3, NOTE_DS4, 0,
+//   0,
+//   NOTE_F3, NOTE_F4, NOTE_D3, NOTE_D4,
+//   NOTE_DS3, NOTE_DS4, 0,
+//   0, NOTE_DS4, NOTE_CS4, NOTE_D4,
+//   NOTE_CS4, NOTE_DS4,
+//   NOTE_DS4, NOTE_GS3,
+//   NOTE_G3, NOTE_CS4,
+//   NOTE_C4, NOTE_FS4, NOTE_F4, NOTE_E3, NOTE_AS4, NOTE_A4,
+//   NOTE_GS4, NOTE_DS4, NOTE_B3,
+//   NOTE_AS3, NOTE_A3, NOTE_GS3,
+//   0, 0, 0
+// };
+// //Underwolrd tempo
+// int underworld_tempo[] = {
+//   12, 12, 12, 12,
+//   12, 12, 6,
+//   3,
+//   12, 12, 12, 12,
+//   12, 12, 6,
+//   3,
+//   12, 12, 12, 12,
+//   12, 12, 6,
+//   3,
+//   12, 12, 12, 12,
+//   12, 12, 6,
+//   6, 18, 18, 18,
+//   6, 6,
+//   6, 6,
+//   6, 6,
+//   18, 18, 18, 18, 18, 18,
+//   10, 10, 10,
+//   10, 10, 10,
+//   3, 3, 3
+// };
+//Start melody
+const uint16_t start_melody[] = { 
   NOTE_E7, NOTE_E7, 0, NOTE_E7,
   0, NOTE_C7, NOTE_E7, 0,
-  NOTE_G7, 0, 0,  0,
-  NOTE_G6, 0, 0, 0,
-
-  NOTE_C7, 0, 0, NOTE_G6,
-  0, 0, NOTE_E6, 0,
-  0, NOTE_A6, 0, NOTE_B6,
-  0, NOTE_AS6, NOTE_A6, 0,
-
-  NOTE_G6, NOTE_E7, NOTE_G7,
-  NOTE_A7, 0, NOTE_F7, NOTE_G7,
-  0, NOTE_E7, 0, NOTE_C7,
-  NOTE_D7, NOTE_B6, 0, 0,
-
-  NOTE_C7, 0, 0, NOTE_G6,
-  0, 0, NOTE_E6, 0,
-  0, NOTE_A6, 0, NOTE_B6,
-  0, NOTE_AS6, NOTE_A6, 0,
-
-  NOTE_G6, NOTE_E7, NOTE_G7,
-  NOTE_A7, 0, NOTE_F7, NOTE_G7,
-  0, NOTE_E7, 0, NOTE_C7,
-  NOTE_D7, NOTE_B6, 0, 0
+  NOTE_G7
 };
-//Mario main them tempo
-int tempo[] = {
+//Start tempo
+const uint16_t start_tempo[] = { 
   12, 12, 12, 12,
   12, 12, 12, 12,
-  12, 12, 12, 12,
-  12, 12, 12, 12,
-
-  12, 12, 12, 12,
-  12, 12, 12, 12,
-  12, 12, 12, 12,
-  12, 12, 12, 12,
-
-  9, 9, 9,
-  12, 12, 12, 12,
-  12, 12, 12, 12,
-  12, 12, 12, 12,
-
-  12, 12, 12, 12,
-  12, 12, 12, 12,
-  12, 12, 12, 12,
-  12, 12, 12, 12,
-
-  9, 9, 9,
-  12, 12, 12, 12,
-  12, 12, 12, 12,
-  12, 12, 12, 12,
+  12
 };
-//Underworld melody
-int underworld_melody[] = {
-  NOTE_C4, NOTE_C5, NOTE_A3, NOTE_A4,
-  NOTE_AS3, NOTE_AS4, 0,
-  0,
-  NOTE_C4, NOTE_C5, NOTE_A3, NOTE_A4,
-  NOTE_AS3, NOTE_AS4, 0,
-  0,
-  NOTE_F3, NOTE_F4, NOTE_D3, NOTE_D4,
-  NOTE_DS3, NOTE_DS4, 0,
-  0,
-  NOTE_F3, NOTE_F4, NOTE_D3, NOTE_D4,
-  NOTE_DS3, NOTE_DS4, 0,
-  0, NOTE_DS4, NOTE_CS4, NOTE_D4,
-  NOTE_CS4, NOTE_DS4,
-  NOTE_DS4, NOTE_GS3,
-  NOTE_G3, NOTE_CS4,
-  NOTE_C4, NOTE_FS4, NOTE_F4, NOTE_E3, NOTE_AS4, NOTE_A4,
-  NOTE_GS4, NOTE_DS4, NOTE_B3,
-  NOTE_AS3, NOTE_A3, NOTE_GS3,
-  0, 0, 0
+//Processing melody
+const uint16_t processing_melody[] = {
+  NOTE_C3, NOTE_F4
 };
-//Underwolrd tempo
-int underworld_tempo[] = {
-  12, 12, 12, 12,
-  12, 12, 6,
-  3,
-  12, 12, 12, 12,
-  12, 12, 6,
-  3,
-  12, 12, 12, 12,
-  12, 12, 6,
-  3,
-  12, 12, 12, 12,
-  12, 12, 6,
-  6, 18, 18, 18,
-  6, 6,
-  6, 6,
-  6, 6,
-  18, 18, 18, 18, 18, 18,
-  10, 10, 10,
-  10, 10, 10,
-  3, 3, 3
+//Processing tempo
+const uint16_t processing_tempo[] = {
+  10, 10
+};
+
+const uint16_t* melodies[] = { start_melody , processing_melody };
+const uint16_t* tempos[] = { start_tempo, processing_tempo };
+const uint16_t sizes[] = { sizeof(start_tempo) / sizeof(uint16_t), sizeof(processing_tempo) / sizeof(uint16_t) };
+
+// void SetupPWMTimer() {
+//   // SETTING UP TIMER1 TO PRODUCE OUTPUT AT OC1B (PB6)
+//   // WGM13-WGM10 = 0111 for fast PWM with 0x03ff as TOP:
+//   TCCR3B &= ~(1 << WGM33);
+//   TCCR3B &= ~(1 << WGM32);
+//   TCCR3A |= (1 << WGM31);
+//   TCCR3A |= (1 << WGM30);
+//   // COM3A1-0 = 10 For clearing OC3A at compare match, setting at TOP
+//   TCCR3A |= (1 << 7);
+//   TCCR3A &= ~(1 << 6);
+//   // CSn2-0 = 011 for clkI/O prescaling by 64
+//   TCCR3B &= ~(1 << 2);
+//   TCCR3B |= (1 << 1);
+//   TCCR3B &= ~(1 << 0);
+//   // Setting up OCR3A
+//   OCR3AH = (uint8_t) 0x00;
+//   OCR3AL = (uint8_t) 0x00;
+//   // Setting up PC6 in output mode to produce OC1A:
+//   DDRC |= (1 << 6);
+// }
+
+
+enum Song {
+  START,
+  PROCESSING,
+  KK_BOSSA
 };

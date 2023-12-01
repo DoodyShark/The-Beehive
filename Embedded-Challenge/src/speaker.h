@@ -12,7 +12,7 @@
 
 
 void buzz(long frequency, long length) {
-  digitalWrite(13, HIGH);
+  PORTC |= (1 << 7);
   long delayValue = 1000000 / frequency / 2; // calculate the delay value between transitions
   //// 1 second's worth of microseconds, divided by the frequency, then split in half since
   //// there are two phases to each cycle
@@ -25,56 +25,32 @@ void buzz(long frequency, long length) {
     PORTC &= ~(1 << 6);
     delayMicroseconds(delayValue); // wait again or the calculated delay value
   }
-  digitalWrite(13, LOW);
+  PORTC &= ~(1 << 7);
 
 }
 
-void sing(int s) {
+void sing(Song s) {
   // iterate over the notes of the melody:
   
-  if (s == 2) {
-    Serial.println(" 'Underworld Theme'");
-    int size = sizeof(underworld_melody) / sizeof(int);
-    for (int thisNote = 0; thisNote < size; thisNote++) {
+  const uint16_t* curr_melody = melodies[s];
+  const uint16_t* curr_tempo = tempos[s];
 
-      // to calculate the note duration, take one second
-      // divided by the note type.
-      //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
-      int noteDuration = 1000 / underworld_tempo[thisNote];
+  int size = sizes[s];
+  for (int thisNote = 0; thisNote < size; thisNote++) {
 
-      buzz(underworld_melody[thisNote], noteDuration);
+    // to calculate the note duration, take one second
+    // divided by the note type.
+    //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+    int noteDuration = 1000 / curr_tempo[thisNote];
 
-      // to distinguish the notes, set a minimum time between them.
-      // the note's duration + 30% seems to work well:
-      int pauseBetweenNotes = noteDuration * 1.20;
-      delay(pauseBetweenNotes);
+    buzz(curr_melody[thisNote], noteDuration);
 
-      // stop the tone playing:
-      buzz(0, noteDuration);
+    // to distinguish the notes, set a minimum time between them.
+    // the note's duration + 30% seems to work well:
+    int pauseBetweenNotes = noteDuration * 1.20;
+    delay(pauseBetweenNotes);
 
-    }
-
-  } else {
-
-    Serial.println(" 'Mario Theme'");
-    int size = sizeof(melody) / sizeof(int);
-    for (int thisNote = 0; thisNote < size; thisNote++) {
-
-      // to calculate the note duration, take one second
-      // divided by the note type.
-      //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
-      int noteDuration = 1000 / tempo[thisNote];
-
-      buzz(melody[thisNote], noteDuration);
-
-      // to distinguish the notes, set a minimum time between them.
-      // the note's duration + 30% seems to work well:
-      int pauseBetweenNotes = noteDuration * 1.20;
-      delay(pauseBetweenNotes);
-
-      // stop the tone playing:
-      buzz(0, noteDuration);
-
-    }
+    // stop the tone playing:
+    buzz(0, noteDuration);
   }
 }
