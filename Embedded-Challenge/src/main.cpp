@@ -22,7 +22,7 @@
 #define MAX_GESTURE_LEN 3
 #define WINDOW_SIZE 5
 #define NO_MOTION_THRESHOLD 0.75
-#define NUM_GESTURES 10
+#define NUM_GESTURES 5
 
 LIS3DHSettings settings = LIS3DHSettings(4, 10, (PM) H, ENABLED, ENABLED, ENABLED);
 LIS3DH LIS3DH_Handler = LIS3DH(settings);
@@ -44,6 +44,7 @@ using namespace std;
 - Goes back to idle if button is pressed
 */
 char state = 'i';
+int chosen_gesture;
 
 long subtotals[3] = {0};
 int window_index = 0;
@@ -55,14 +56,14 @@ float average_time_diff = 0;
 uint32_t count_ticks = 0;
 
 const uint8_t idle_freq = 2;
-const uint8_t active_freq = 5;
+const uint8_t active_freq = 7;
 
 const uint8_t collecter_size = active_freq * MAX_GESTURE_LEN;
 
 int16_t collecter[collecter_size][3] {{0}}; // Holds data { ax, ay, az }
 int collecter_index = 0;
 
-uint32_t DWT_matrix[collecter_size + 1][collecter_size + 1] = {{(uint32_t) 0xffffffff}};
+double DTW_matrix[collecter_size + 1][collecter_size + 1] {{INFINITY}};
 
 uint8_t wait_between_checks = 0;
 
@@ -76,16 +77,51 @@ void setup() {
   LIS3DH_Handler = LIS3DH(settings);
   LIS3DH_Handler.SetupAccelerometer();
   sing((Song) MARIO);
+  for (int r = collecter_size; r >= 0; r--) {
+    for (int c = 0; c < collecter_size; c++) {
+      DTW_matrix[r][c] = INFINITY;
+    }
+  }
+  // for (int r = collecter_size; r >= 0; r--) {
+  //   for (int c = 0; c < collecter_size; c++) {
+  //     Serial.print(DTW_matrix[r][c]);
+  //     Serial.print('\t');
+  //   }
+  //   Serial.println();
+  // }
+  // Serial.println();
+  // Serial.println();
   last_ms = millis();
 }
 
-void calculate_DWT(const uint16_t* gesture) {
-  DWT_matrix[0][0] = 0;
+float calculate_DTW(const int16_t* gesture) {
+  DTW_matrix[0][0] = 0;
   for (int r = 1; r < collecter_size + 1; r++) {
+    // Serial.print("(");
+    // Serial.print((int16_t)pgm_read_word(gesture + (r-1) * 3 + 0));
+    // Serial.print(", ");
+    // Serial.print((int16_t)pgm_read_word(gesture + (r-1) * 3 + 1));
+    // Serial.print(", ");
+    // Serial.print((int16_t)pgm_read_word(gesture + (r-1) * 3 + 2));
+    // Serial.print(")");
+    // Serial.println();
     for (int c = 1; c < collecter_size + 1; c++) {
-      DWT_matrix[r][c] = abs(gesture[r * 3 + 0] - collecter[c][0]) + abs(gesture[r * 3 + 1] - collecter[c][1]) + abs(gesture[r * 3 + 2] - collecter[c][2]) + min(DWT_matrix[r - 1][c - 1], min(DWT_matrix[r - 1][c], DWT_matrix[r][c - 1]));
+      double dist = sqrt(pow((int16_t)pgm_read_word(gesture + (r - 1) * 3 + 0) - (double)collecter[(c-1)][0], 2) + pow((int16_t)pgm_read_word(gesture + (r - 1) * 3 + 1) - (double)collecter[(c-1)][1], 2) + pow( (int16_t)pgm_read_word(gesture + (r - 1) * 3 + 2) - (double) collecter[(c-1)][2], 2) );
+      // Serial.println(dist);
+      DTW_matrix[r][c] = abs(dist + min(DTW_matrix[r - 1][c - 1], min(DTW_matrix[r - 1][c], DTW_matrix[r][c - 1])));
+      // Serial.println(DTW_matrix[r][c]);
     }
   }
+  // for (int r = collecter_size; r >= 0; r--) {
+  //   for (int c = 0; c < collecter_size; c++) {
+  //     Serial.print(DTW_matrix[r][c]);
+  //     Serial.print('\t');
+  //   }
+  //   Serial.println();
+  // }
+  // Serial.println();
+  // Serial.println();
+  return DTW_matrix[collecter_size][collecter_size];
 }
 
 bool collect(uint8_t frequency) {
@@ -103,6 +139,12 @@ bool collect(uint8_t frequency) {
     collecter[collecter_index][0] = subtotals[0] / window_index ;
     collecter[collecter_index][1] = subtotals[1] / window_index ;
     collecter[collecter_index][2] = subtotals[2] / window_index ;
+    Serial.print(collecter[collecter_index][0]);
+    Serial.print(", ");
+    Serial.print(collecter[collecter_index][1]);
+    Serial.print(", ");
+    Serial.print(collecter[collecter_index][2]);
+    Serial.print(",\n");
     collecter_index++;
     window_index = 0;
     subtotals[0] = subtotals[1] = subtotals[2] = 0;
@@ -117,9 +159,9 @@ bool check_start() {
   // Serial.println("------------");
   for (int i = 1; i < stop; i++) {
     float factor = settings.Calc_Div_Factor();
-    float idle_jerk_x = (collecter[collecter_index - stop + i][0] - collecter[collecter_index - stop + (i - 1)][0]) / (factor * average_time_diff);
-    float idle_jerk_y = (collecter[collecter_index - stop + i][1] - collecter[collecter_index - stop + (i - 1)][1]) / (factor * average_time_diff);
-    float idle_jerk_z = (collecter[collecter_index - stop + i][2] - collecter[collecter_index - stop + (i - 1)][2]) / (factor * average_time_diff);
+    float idle_jerk_x = (collecter[collecter_index - stop + i][0] - collecter[collecter_index - stop + (i - 1)][0]) / (9.8 * factor * average_time_diff);
+    float idle_jerk_y = (collecter[collecter_index - stop + i][1] - collecter[collecter_index - stop + (i - 1)][1]) / (9.8 * factor * average_time_diff);
+    float idle_jerk_z = (collecter[collecter_index - stop + i][2] - collecter[collecter_index - stop + (i - 1)][2]) / (9.8 * factor * average_time_diff);
     res &= (abs(idle_jerk_x) < NO_MOTION_THRESHOLD) && (abs(idle_jerk_y) < NO_MOTION_THRESHOLD) && (abs(idle_jerk_z) < NO_MOTION_THRESHOLD);
   }
   // Serial.println("------------");
@@ -127,8 +169,8 @@ bool check_start() {
   return res;
 }
 
-void flush(int16_t acceleration_collector[][3], int& index) {
-  for (int i = 0; i < index; i++) {
+void flush(int16_t acceleration_collector[][3], int& index, int size) {
+  for (int i = 0; i < size; i++) {
     for (int j = 0; j < 3; j++) {
       acceleration_collector[i][j] = 0;
     }
@@ -143,10 +185,14 @@ bool just_added = false;
 void loop() {
   if (((PIND >> 4) & 1)) {
     state = 'i';
-    flush(collecter, collecter_index);
+    flush(collecter, collecter_index, collecter_size);
   }
   if (state == 'a' && ((PINF >> 6) & 1)) {
     state = 'p';
+    sing((Song) PROCESSING);
+  }
+  if (state == 'd' && ((PINF >> 6) & 1)) { 
+    state = 'i';
     sing((Song) PROCESSING);
   }
   switch (state) {
@@ -159,14 +205,15 @@ void loop() {
           if (wait_between_checks >= NO_MOTION_TIME * idle_freq) {
             if (check_start()) {
               state = 'a';
-              flush(collecter, collecter_index);
+              flush(collecter, collecter_index, collecter_size);
               sing((Song) START);
+              Serial.println("---------------");
             }
           }
         }
       }
       else {
-        flush(collecter, collecter_index);
+        flush(collecter, collecter_index, collecter_size);
       }
     }
     break;
@@ -183,15 +230,29 @@ void loop() {
     break;
     // PROCESSING
     case 'p': {
-      Serial.println("Processing");
-      // for (int i = 0; i < NUM_GESTURES; i++) {
-      //   calculate_DWT(gestures[i]);
-      // }
+      Serial.println("-------------");
+      uint32_t min = UINT32_MAX;
+      for (int i = 0; i < NUM_GESTURES; i++) {
+        double curr = calculate_DTW(gestures[i]);
+        Serial.println(curr);
+        if (curr < min) {
+          min = curr;
+          chosen_gesture = i;
+        }
+      }
+      state = 'd';
+      just_added = true;
     }
     break;
     // DISPLAY
     case 'd': {
-      
+      if (just_added) {
+        Serial.print("Chose: ");
+        Serial.println(gesture_names[chosen_gesture]);
+        flush(collecter, collecter_index, collecter_size);
+        Serial.println("-------------");
+        just_added = false;
+      }
     }
     break;
   }
