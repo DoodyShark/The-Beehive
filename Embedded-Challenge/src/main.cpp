@@ -19,10 +19,12 @@
 #include "speaker.h"
 #endif
 #define NO_MOTION_TIME 3
-#define MAX_GESTURE_LEN 3
+#define MAX_GESTURE_LEN 2.9
 #define WINDOW_SIZE 5
-#define NO_MOTION_THRESHOLD 0.75
+#define NO_MOTION_THRESHOLD 0.25
 #define NUM_GESTURES 5
+#define IDLE_FREQ 2
+#define ACTIVE_FREQ 7
 
 LIS3DHSettings settings = LIS3DHSettings(4, 10, (PM) H, ENABLED, ENABLED, ENABLED);
 LIS3DH LIS3DH_Handler = LIS3DH(settings);
@@ -44,7 +46,7 @@ using namespace std;
 - Goes back to idle if button is pressed
 */
 char state = 'i';
-int chosen_gesture;
+uint8_t chosen_gesture;
 
 long subtotals[3] = {0};
 int window_index = 0;
@@ -55,15 +57,12 @@ long last_ms;
 float average_time_diff = 0;
 uint32_t count_ticks = 0;
 
-const uint8_t idle_freq = 2;
-const uint8_t active_freq = 7;
-
-const uint8_t collecter_size = active_freq * MAX_GESTURE_LEN;
+const uint8_t collecter_size = ACTIVE_FREQ * MAX_GESTURE_LEN;
 
 int16_t collecter[collecter_size][3] {{0}}; // Holds data { ax, ay, az }
 int collecter_index = 0;
 
-double DTW_matrix[collecter_size + 1][collecter_size + 1] {{INFINITY}};
+float DTW_matrix[collecter_size + 1][collecter_size + 1] {{INFINITY}};
 
 uint8_t wait_between_checks = 0;
 
@@ -106,7 +105,7 @@ float calculate_DTW(const int16_t* gesture) {
     // Serial.print(")");
     // Serial.println();
     for (int c = 1; c < collecter_size + 1; c++) {
-      double dist = sqrt(pow((int16_t)pgm_read_word(gesture + (r - 1) * 3 + 0) - (double)collecter[(c-1)][0], 2) + pow((int16_t)pgm_read_word(gesture + (r - 1) * 3 + 1) - (double)collecter[(c-1)][1], 2) + pow( (int16_t)pgm_read_word(gesture + (r - 1) * 3 + 2) - (double) collecter[(c-1)][2], 2) );
+      float dist = sqrt(pow((int16_t)pgm_read_word(gesture + (r - 1) * 3 + 0) - (float)collecter[(c-1)][0], 2) + pow((int16_t)pgm_read_word(gesture + (r - 1) * 3 + 1) - (float)collecter[(c-1)][1], 2) + pow( (int16_t)pgm_read_word(gesture + (r - 1) * 3 + 2) - (float) collecter[(c-1)][2], 2) );
       // Serial.println(dist);
       DTW_matrix[r][c] = abs(dist + min(DTW_matrix[r - 1][c - 1], min(DTW_matrix[r - 1][c], DTW_matrix[r][c - 1])));
       // Serial.println(DTW_matrix[r][c]);
@@ -140,11 +139,11 @@ bool collect(uint8_t frequency) {
     collecter[collecter_index][1] = subtotals[1] / window_index ;
     collecter[collecter_index][2] = subtotals[2] / window_index ;
     Serial.print(collecter[collecter_index][0]);
-    Serial.print(", ");
+    Serial.print(F(", "));
     Serial.print(collecter[collecter_index][1]);
-    Serial.print(", ");
+    Serial.print(F(", "));
     Serial.print(collecter[collecter_index][2]);
-    Serial.print(",\n");
+    Serial.print(F(",\n"));
     collecter_index++;
     window_index = 0;
     subtotals[0] = subtotals[1] = subtotals[2] = 0;
@@ -155,7 +154,7 @@ bool collect(uint8_t frequency) {
 
 bool check_start() {
   bool res = true;
-  int stop = NO_MOTION_TIME * idle_freq;
+  int stop = NO_MOTION_TIME * IDLE_FREQ;
   // Serial.println("------------");
   for (int i = 1; i < stop; i++) {
     float factor = settings.Calc_Div_Factor();
@@ -199,15 +198,15 @@ void loop() {
     // IDLE
     case 'i': {
       if (collecter_index < collecter_size) {
-        just_added = collect(idle_freq);
+        just_added = collect(IDLE_FREQ);
         if (just_added) {
           wait_between_checks++;
-          if (wait_between_checks >= NO_MOTION_TIME * idle_freq) {
+          if (wait_between_checks >= NO_MOTION_TIME * IDLE_FREQ) {
             if (check_start()) {
               state = 'a';
               flush(collecter, collecter_index, collecter_size);
               sing((Song) START);
-              Serial.println("---------------");
+              Serial.println(F("---------------"));
             }
           }
         }
@@ -220,7 +219,7 @@ void loop() {
     // ACTIVE DATA COLLECTION
     case 'a': {
       if (collecter_index < collecter_size) {
-        collect(active_freq);
+        collect(ACTIVE_FREQ);
       }
       else {
         state = 'p';
@@ -230,10 +229,10 @@ void loop() {
     break;
     // PROCESSING
     case 'p': {
-      Serial.println("-------------");
+      Serial.println(F("-------------"));
       uint32_t min = UINT32_MAX;
       for (int i = 0; i < NUM_GESTURES; i++) {
-        double curr = calculate_DTW(gestures[i]);
+        float curr = calculate_DTW(gestures[i]);
         Serial.println(curr);
         if (curr < min) {
           min = curr;
@@ -247,10 +246,10 @@ void loop() {
     // DISPLAY
     case 'd': {
       if (just_added) {
-        Serial.print("Chose: ");
-        Serial.println(gesture_names[chosen_gesture]);
+        Serial.print(F("Chose: "));
+        Serial.println(char(pgm_read_byte(gesture_names + chosen_gesture)));
         flush(collecter, collecter_index, collecter_size);
-        Serial.println("-------------");
+        Serial.println(F("-------------"));
         just_added = false;
       }
     }

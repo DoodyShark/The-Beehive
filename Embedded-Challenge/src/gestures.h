@@ -164,10 +164,10 @@ const int16_t* gestures[] = {
     gesture9
 };
 
-const char* gesture_names[] = {
-    "Figure 8",
-    "Infinity",
-    "M-shape",
-    "W-shape",
-    "Circle Clockwise",
+const char PROGMEM gesture_names[] = {
+    '8',
+    'i',
+    'M',
+    'W',
+    'O',
 };

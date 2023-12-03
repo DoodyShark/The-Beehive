@@ -20,8 +20,8 @@ enum EN {
 class LIS3DHSettings{
 
     private:
-    int max_accel;
-    int frequency;
+    uint8_t max_accel;
+    uint16_t frequency;
     PM power_mode;
     bool xen;
     bool yen;
@@ -38,7 +38,7 @@ class LIS3DHSettings{
         this->zen = true;
     }
 
-    LIS3DHSettings(int max_a, int freq, PM p_m, EN x, EN y, EN z) {
+    LIS3DHSettings(uint8_t max_a, uint16_t freq, PM p_m, EN x, EN y, EN z) {
         this->max_accel = max_a;
         this->frequency = freq;
         this->power_mode = p_m;
@@ -47,11 +47,11 @@ class LIS3DHSettings{
         this->zen = z;
     }
 
-    int get_freq() {
+    uint8_t get_freq() {
         return this->frequency;
     }
 
-    int get_max_accel() {
+    uint16_t get_max_accel() {
         return this->max_accel;
     }
 

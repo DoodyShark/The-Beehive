@@ -3,7 +3,7 @@
 #define PREDIRECTIVES 0
 #endif
 #ifndef SPI_OWN
-#include "SPI_Own.h"
+#include "SPI.h"
 #define SPI_OWN
 #endif
 #ifndef LIS3DH_SETTINGS
@@ -98,8 +98,7 @@ class LIS3DH {
         setFreq();
         setPowerMode();
         setMaxAccel();
-        for (long i = 0; i < 1000000; i++);
-        // delay(100);
+        delay(100);
     }
 
     int16_t getXRaw() {
