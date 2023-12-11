@@ -7,7 +7,7 @@
 #include "gestures.h"
 #endif
 #ifndef SPI_OWN
-#include "SPI.h"
+#include "SPI_Own.h"
 #define SPI_OWN 0
 #endif
 #ifndef LIS3DH_OWN
@@ -19,17 +19,27 @@
 #include "speaker.h"
 #endif
 #define NO_MOTION_TIME 3
-#define MAX_GESTURE_LEN 2.9
+#define MAX_GESTURE_LEN 2.99
 #define WINDOW_SIZE 5
 #define NO_MOTION_THRESHOLD 0.25
 #define NUM_GESTURES 5
+#define NUM_TRIALS 2
 #define IDLE_FREQ 2
 #define ACTIVE_FREQ 7
-
-LIS3DHSettings settings = LIS3DHSettings(4, 10, (PM) H, ENABLED, ENABLED, ENABLED);
-LIS3DH LIS3DH_Handler = LIS3DH(settings);
+#include "Copied_Adafruit.h"
 
 using namespace std;
+
+/*
+  Accelerometer handling objects.
+  The chosen accelerometer settings are:
+  - Max/Min acceleration = +/- 4g
+  - Frequency 10 Hz (acceleration is measured every 100 ms)
+  - High Power Mode to allow for higher precision in reading the data
+  - All 3 channels ENABLED
+*/
+LIS3DHSettings settings = LIS3DHSettings(4, 10, (PM) H, ENABLED, ENABLED, ENABLED);
+LIS3DH LIS3DH_Handler = LIS3DH(settings);
 
 /*
 'i' = Idle:
@@ -46,14 +56,23 @@ using namespace std;
 - Goes back to idle if button is pressed
 */
 char state = 'i';
+
 uint8_t chosen_gesture;
 
+/*
+  Moving average filter setup
+  subtotals holds the cummulitive ax, ay, and az, sums to create a moving average filter
+  window_index counts up until WINDOW_SIZE before averaging the sum
+*/ 
 long subtotals[3] = {0};
 int window_index = 0;
 
 long prev_last_ms;
 long last_ms;
 
+/*
+  Calculates the average 
+*/
 float average_time_diff = 0;
 uint32_t count_ticks = 0;
 
@@ -67,6 +86,9 @@ float DTW_matrix[collecter_size + 1][collecter_size + 1] {{INFINITY}};
 uint8_t wait_between_checks = 0;
 
 void setup() {
+  CircuitPlayground.begin();
+  CircuitPlayground.setBrightness(20);
+  CircuitPlayground.clearPixels();
   DDRC |= (1 << 7);
   DDRC |= (1 << 6);
   DDRF &= ~(1 << 6); // Right Button
@@ -184,14 +206,17 @@ bool just_added = false;
 void loop() {
   if (((PIND >> 4) & 1)) {
     state = 'i';
+    CircuitPlayground.clearPixels();
     flush(collecter, collecter_index, collecter_size);
   }
   if (state == 'a' && ((PINF >> 6) & 1)) {
     state = 'p';
+    CircuitPlayground.clearPixels();
     sing((Song) PROCESSING);
   }
   if (state == 'd' && ((PINF >> 6) & 1)) { 
     state = 'i';
+    CircuitPlayground.clearPixels();
     sing((Song) PROCESSING);
   }
   switch (state) {
@@ -213,6 +238,7 @@ void loop() {
       }
       else {
         flush(collecter, collecter_index, collecter_size);
+        CircuitPlayground.clearPixels();
       }
     }
     break;
@@ -231,7 +257,7 @@ void loop() {
     case 'p': {
       Serial.println(F("-------------"));
       uint32_t min = UINT32_MAX;
-      for (int i = 0; i < NUM_GESTURES; i++) {
+      for (int i = 0; i < NUM_GESTURES * NUM_TRIALS; i++) {
         float curr = calculate_DTW(gestures[i]);
         Serial.println(curr);
         if (curr < min) {
@@ -247,7 +273,9 @@ void loop() {
     case 'd': {
       if (just_added) {
         Serial.print(F("Chose: "));
-        Serial.println(char(pgm_read_byte(gesture_names + chosen_gesture)));
+        Serial.println(char(pgm_read_byte(gesture_names + (chosen_gesture % NUM_GESTURES))));
+        // CircuitPlayground.clearPixels();
+        CircuitPlayground.setPixelColor(chosen_gesture % NUM_GESTURES, 128, 50, 30);
         flush(collecter, collecter_index, collecter_size);
         Serial.println(F("-------------"));
         just_added = false;

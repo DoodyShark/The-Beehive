@@ -190,27 +190,6 @@ const uint16_t* melodies[] = { melody, start_melody , processing_melody };
 const uint16_t* tempos[] = { tempo, start_tempo, processing_tempo };
 const uint16_t sizes[] = { 47, 7, 2 };
 
-// void SetupPWMTimer() {
-//   // SETTING UP TIMER1 TO PRODUCE OUTPUT AT OC1B (PB6)
-//   // WGM13-WGM10 = 0111 for fast PWM with 0x03ff as TOP:
-//   TCCR3B &= ~(1 << WGM33);
-//   TCCR3B &= ~(1 << WGM32);
-//   TCCR3A |= (1 << WGM31);
-//   TCCR3A |= (1 << WGM30);
-//   // COM3A1-0 = 10 For clearing OC3A at compare match, setting at TOP
-//   TCCR3A |= (1 << 7);
-//   TCCR3A &= ~(1 << 6);
-//   // CSn2-0 = 011 for clkI/O prescaling by 64
-//   TCCR3B &= ~(1 << 2);
-//   TCCR3B |= (1 << 1);
-//   TCCR3B &= ~(1 << 0);
-//   // Setting up OCR3A
-//   OCR3AH = (uint8_t) 0x00;
-//   OCR3AL = (uint8_t) 0x00;
-//   // Setting up PC6 in output mode to produce OC1A:
-//   DDRC |= (1 << 6);
-// }
-
 
 enum Song {
   MARIO,

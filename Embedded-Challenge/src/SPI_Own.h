@@ -3,7 +3,7 @@
 #define PREDIRECTIVES 0
 #endif
 
-namespace SPI {
+namespace SPI_Own {
   /// @brief Setup the SPI Connection as Master CPU
   void SPI_MasterInit()
   {

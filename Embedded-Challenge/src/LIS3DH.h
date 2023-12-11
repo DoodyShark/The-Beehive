@@ -3,7 +3,7 @@
 #define PREDIRECTIVES 0
 #endif
 #ifndef SPI_OWN
-#include "SPI.h"
+#include "SPI_Own.h"
 #define SPI_OWN
 #endif
 #ifndef LIS3DH_SETTINGS
@@ -11,7 +11,7 @@
 #define LIS3DH_SETTINGS 0
 #endif
 
-using namespace SPI;
+using namespace SPI_Own;
 
 class LIS3DH {
     private:
