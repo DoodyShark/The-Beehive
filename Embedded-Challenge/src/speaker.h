@@ -1,3 +1,9 @@
+/*
+  Code edited from: https://www.instructables.com/Arduino-Mario-Bros-Theme-Song/
+  by: Dipto Pratyaksa
+  Main edit was reading from flash which involves using pgm_read_word
+*/
+
 #ifdef __has_include
     #if __has_include(<Arduino.h>)
         #include <Arduino.h>
@@ -9,7 +15,6 @@
 #define SONGS 0
 #include "songs.h"
 #endif
-
 
 void buzz(uint16_t frequency, long length) {
   PORTC |= (1 << 7);

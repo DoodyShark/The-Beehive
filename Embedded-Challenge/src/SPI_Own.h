@@ -1,8 +1,11 @@
+// Import relevant code
+
 #ifndef PREDIRECTIVES
 #include "predirectives.h"
 #define PREDIRECTIVES 0
 #endif
 
+/// @brief The SPI_Own namespace holds all relevant SPI functionalities
 namespace SPI_Own {
   /// @brief Setup the SPI Connection as Master CPU
   void SPI_MasterInit()
@@ -28,7 +31,7 @@ namespace SPI_Own {
   {
     /* Start transmission */
     SPDR = cData;
-    asm volatile("nop"); // Might need this
+    asm volatile("nop");
     /* Wait for transmission complete */
     while(!(SPSR & (1<<SPIF)));
     /* Read returned value */
@@ -43,10 +46,6 @@ namespace SPI_Own {
 
     dataLSB = (uint8_t) (cData & (uint16_t) 0x00FF);
     dataMSB = (uint8_t) ((cData & (uint16_t) 0xFF00) >> 8);
-    // Serial.print("Sent dataMSB, dataLSB: ");
-    // Serial.print(dataMSB);
-    // Serial.print(" ");
-    // Serial.println(dataLSB);
 
     /* Start transmission with MSB */
     SPDR = dataMSB;

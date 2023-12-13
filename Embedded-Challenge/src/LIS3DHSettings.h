@@ -1,3 +1,5 @@
+// Import relevant code
+
 #ifndef INT_TYPES
 #define INT_TYPES 0
 #include <inttypes.h>
@@ -7,16 +9,19 @@
 #define LIS3DH_PREDIRECTIVES 0
 #endif
 
+// Available Power Modes
 enum PM {
     L = 0,
     N = 1,
     H = 2
 };
 
+// Enabled modes
 enum EN {
     DISABLED, ENABLED
 };
 
+/// @brief Stores and handles the settings relevant to LIS3DH accelerometer
 class LIS3DHSettings{
 
     private:
@@ -28,7 +33,8 @@ class LIS3DHSettings{
     bool zen;
 
     public:
-
+    
+    /// @brief Default constructor
     LIS3DHSettings() {
         this->max_accel = 16;
         this->frequency = 1;
@@ -38,6 +44,13 @@ class LIS3DHSettings{
         this->zen = true;
     }
 
+    /// @brief Non-default constructor
+    /// @param max_a the maximum absolute acceleration
+    /// @param freq the data collection frequency
+    /// @param p_m the power mode
+    /// @param x whether x is enabled
+    /// @param y whether y is enabled
+    /// @param z whether z is enabled
     LIS3DHSettings(uint8_t max_a, uint16_t freq, PM p_m, EN x, EN y, EN z) {
         this->max_accel = max_a;
         this->frequency = freq;
@@ -46,6 +59,8 @@ class LIS3DHSettings{
         this->yen = y;
         this->zen = z;
     }
+
+    // Getters
 
     uint8_t get_freq() {
         return this->frequency;
@@ -71,6 +86,9 @@ class LIS3DHSettings{
         return this->zen;
     }
 
+    /// @brief Converts the frequency setting to the corresponding byte
+    /// @param curr_val takes the current value of the relevant register
+    /// @return the byte after converting the frequency as described in the datasheet
     uint8_t Freq_to_Byte(uint8_t curr_val) {
         switch (this->frequency) {
         case 0:
@@ -125,6 +143,9 @@ class LIS3DHSettings{
         return curr_val;
     }
 
+    /// @brief Converts the max absolute acceleration setting to the corresponding byte
+    /// @param curr_val takes the current value of the relevant register
+    /// @return the byte after converting the max absolute acceleration as described in the datasheet
     uint8_t Max_Accel_to_Byte(uint8_t curr_val) {
         switch (this->max_accel) {
         case 2:
@@ -147,6 +168,10 @@ class LIS3DHSettings{
         return curr_val;
     }
 
+    /// @brief Converts the power mode setting to the corresponding byte
+    /// @param curr_val1 takes the current value of the first relevant register
+    /// @param curr_val4 takes the current value of the second relevant register
+    /// @return the byte after converting the power mode as described in the datasheet
     uint16_t Power_Mode_to_Byte(uint8_t curr_val1, uint8_t curr_val4) {
         switch (this->power_mode) {
             case (PM) L:
@@ -165,6 +190,9 @@ class LIS3DHSettings{
         return ((uint16_t) curr_val4) | ((uint16_t) curr_val1 ) << 8;
     }
 
+    /*
+        Calculates the factor to convert from raw acceleration to acceleration in g
+    */
     float Calc_Div_Factor() {
         if (this->power_mode == 'l') {
             switch (this->max_accel) {

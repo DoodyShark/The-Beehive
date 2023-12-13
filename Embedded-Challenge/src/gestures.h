@@ -1,3 +1,11 @@
+/*
+    This file holds all the training recordings for the gestures. The recordings are unique to each person
+    and thus need to first be recorded by the user. Because the flash memory is read only and can only be
+    changed the first time the code is uploaded, there isn't a way to automate the training stage and that
+    needs to be done manually. All data needs to be stored in the flash because otherwise, the data will
+    run out almost immediately
+*/
+
 #ifdef __has_include
     #if __has_include(<Arduino.h>)
         #include <Arduino.h>
@@ -30,27 +38,26 @@ const int16_t PROGMEM gesture0[] = {
 };
 
 const int16_t PROGMEM gesture0_1[] = {
-    481, 85, -54,
-    496, 65, -42,
-    516, 117, -76,
-    470, 214, -107,
-    355, 340, -131,
-    263, 312, -120,
-    303, 140, -59,
-    442, -60, -33,
-    462, 14, -141,
-    384, 160, -240,
-    313, 284, -346,
-    358, 348, -430,
-    437, 194, -422,
-    432, 64, -305,
-    408, 66, -220,
-    385, 158, -126,
-    420, 142, -109,
-    464, 120, -103,
-    472, 110, -89,
-    475, 115, -86,
-    471, 114, -81,
+    454, 147, -77,
+    466, 124, -87,
+    484, 109, -101,
+    510, 198, -98,
+    479, 267, -56,
+    393, 285, -34,
+    366, 204, -63,
+    356, -46, -131,
+    438, -113, -181,
+    480, -18, -193,
+    403, 138, -184,
+    329, 252, -161,
+    353, 391, -166,
+    417, 413, -247,
+    460, 307, -312,
+    435, 176, -337,
+    388, 122, -225,
+    383, 171, -137,
+    391, 203, -101,
+    425, 159, -130,
 };
 
 // Infinity : Dhiyaa () Neil () Shaayan () Yufei ()

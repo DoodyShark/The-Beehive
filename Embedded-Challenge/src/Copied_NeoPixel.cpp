@@ -1,3 +1,26 @@
+/*
+  This code is taken from the Adafruit Circuit Playground library with major
+  edits to cut down on the space usage. The only used functionality was the
+  neopixels, and thus everything else was omitted.
+*/
+
+/*!
+ * @file Adafruit_Circuit_Playground.h
+ *
+ * This is part of Adafruit's CircuitPlayground driver for the Arduino platform.
+ * It is designed specifically to work with the Adafruit CircuitPlayground
+ * boards.
+ *
+ * Adafruit invests time and resources providing this open source code,
+ * please support Adafruit and open-source hardware by purchasing
+ * products from Adafruit!
+ *
+ * Written by Ladyada and others for Adafruit Industries.
+ *
+ * BSD license, all text here must be included in any redistribution.
+ *
+ */
+
 #include "Copied_NeoPixel.h"
 
 /*!

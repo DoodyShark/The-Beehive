@@ -1,3 +1,9 @@
+/*
+  This code is taken from the Adafruit Circuit Playground library with major
+  edits to cut down on the space usage. The only used functionality was the
+  neopixels, and thus everything else was omitted.
+*/
+
 /*!
  * @file Adafruit_Circuit_Playground.h
  *

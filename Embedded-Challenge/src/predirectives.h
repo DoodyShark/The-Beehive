@@ -5,7 +5,7 @@
     #endif
 #endif
 
-// Relevant SPI Registers & Values
+// Relevant values
 #ifndef DDRB
 #define DDRB (*(volatile uint8_t *)((0x04) + 0x20))
 #endif
