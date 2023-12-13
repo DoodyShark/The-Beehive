@@ -27,7 +27,7 @@
 #define MAX_GESTURE_LEN 2.99
 #define WINDOW_SIZE 5
 #define NO_MOTION_THRESHOLD 0.15
-#define NUM_GESTURES 5
+#define NUM_GESTURES 10
 #define NUM_TRIALS 2
 #define IDLE_FREQ 2
 #define ACTIVE_FREQ 7
